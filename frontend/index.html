@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>UID Bypass</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header card">
+        <div class="logo-dot" aria-hidden="true"></div>
+        <div>
+          <h1>UID Bypass</h1>
+          <p class="subtitle">Secure change · Neumorphic console</p>
+        </div>
+      </header>
+
+      <main class="card form-card">
+        <label class="field">
+          <span>Current UID</span>
+          <div class="input-shell">
+            <input
+              id="old_uid"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              maxlength="64"
+              placeholder="old_uid"
+            />
+          </div>
+          <span class="hint" id="old_hint"></span>
+        </label>
+
+        <label class="field">
+          <span>New UID</span>
+          <div class="input-shell">
+            <input
+              id="new_uid"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              maxlength="64"
+              placeholder="new_uid"
+            />
+          </div>
+          <span class="hint" id="new_hint"></span>
+        </label>
+
+        <button id="submit" class="btn" type="button" disabled>
+          <span class="btn-label">Change UID</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </main>
+
+      <div id="alert" class="alert" hidden role="status"></div>
+
+      <footer class="footer">
+        <span id="user_label">Open inside Telegram</span>
+      </footer>
+    </div>
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
