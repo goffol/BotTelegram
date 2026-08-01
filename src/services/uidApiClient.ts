@@ -162,3 +162,39 @@ export async function changeUid(input: ChangeUidInput): Promise<UidApiResult> {
     }
   );
 }
+
+/**
+ * Add a new UID via the new SyntaxCorporation API.
+ */
+export async function addUid(accountId: string): Promise<UidApiResult> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch(`https://uid.syntaxcorporation.online/uid?add=${encodeURIComponent(accountId)}&days=1`, {
+      method: "GET",
+      signal: controller.signal,
+    });
+    const payload = await res.json();
+    
+    // API returns success: boolean and message: string
+    const success = typeof payload.success === "boolean" ? payload.success : res.ok;
+    
+    return {
+      ok: success,
+      status: res.status,
+      message: payload.message || (success ? "UID added successfully." : "Failed to add UID."),
+      retryable: false,
+    };
+  } catch (err) {
+    logger.error("Error adding UID", { err: String(err) });
+    return {
+      ok: false,
+      status: 0,
+      message: "Network error reaching add API.",
+      retryable: false,
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}

@@ -1,6 +1,7 @@
 import { env } from "./config/env.js";
 import { createBot } from "./bot/createBot.js";
 import { startHttpServer } from "./server/httpServer.js";
+import { startDiscordBot } from "./discord/bot.js";
 import { logger } from "./utils/logger.js";
 
 process.on("unhandledRejection", (reason) => {
@@ -30,6 +31,13 @@ async function main(): Promise<void> {
   }
 
   startHttpServer();
+
+  try {
+    await startDiscordBot();
+    logger.info("Discord bot started");
+  } catch (err) {
+    logger.error("Failed to start Discord bot", { err: String(err) });
+  }
 
   const bot = createBot();
 

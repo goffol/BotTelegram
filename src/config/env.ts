@@ -30,6 +30,13 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
   UPSTREAM_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  DISCORD_TOKEN: z.string().optional(),
+  DISCORD_CHANNEL_ID: z.string().optional(),
+  DISCORD_ADMIN_IDS: z
+    .string()
+    .optional()
+    .default("")
+    .transform((raw) => raw.split(",").map((s) => s.trim()).filter(Boolean)),
 });
 
 export type AppConfig = z.infer<typeof envSchema> & {
