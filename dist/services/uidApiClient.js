@@ -6,8 +6,11 @@ function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
 }
 function userFacingMessage(status, bodyMessage) {
+    if (bodyMessage && bodyMessage.length < 200) {
+        return bodyMessage.replace(/api[_-]?key/gi, "[redacted]");
+    }
     if (status === 401 || status === 403) {
-        return "Authorization failed with the upstream service. Contact an administrator.";
+        return "Authorization failed with the upstream service. Check your API key.";
     }
     if (status === 404) {
         return "Upstream endpoint not found. Contact an administrator.";
@@ -17,10 +20,6 @@ function userFacingMessage(status, bodyMessage) {
     }
     if (status >= 500) {
         return "Upstream service is temporarily unavailable. Please try again shortly.";
-    }
-    if (bodyMessage && bodyMessage.length < 200) {
-        // Prefer short safe messages from API if present
-        return bodyMessage.replace(/api[_-]?key/gi, "[redacted]");
     }
     if (status >= 400) {
         return "Request was rejected. Check your UIDs and try again.";
@@ -140,5 +139,39 @@ export async function changeUid(input) {
         message: "Upstream request failed.",
         retryable: false,
     });
+}
+/**
+ * Add a new UID via the new SyntaxCorporation API.
+ */
+export async function addUid(accountId) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    try {
+        const res = await fetch(`https://uid.syntaxcorporation.online/uid?add=${encodeURIComponent(accountId)}&days=1`, {
+            method: "GET",
+            signal: controller.signal,
+        });
+        const payload = await res.json();
+        // API returns success: boolean and message: string
+        const success = typeof payload.success === "boolean" ? payload.success : res.ok;
+        return {
+            ok: success,
+            status: res.status,
+            message: payload.message || (success ? "UID added successfully." : "Failed to add UID."),
+            retryable: false,
+        };
+    }
+    catch (err) {
+        logger.error("Error adding UID", { err: String(err) });
+        return {
+            ok: false,
+            status: 0,
+            message: "Network error reaching add API.",
+            retryable: false,
+        };
+    }
+    finally {
+        clearTimeout(timer);
+    }
 }
 //# sourceMappingURL=uidApiClient.js.map

@@ -8,7 +8,7 @@ import {
   listDiscordAccess,
   addFlowRecord,
   getRecentFlowRecords,
-} from "./discordStorage.js";
+} from "../services/discordStorage.js";
 
 let client: Client | null = null;
 
@@ -26,7 +26,7 @@ export async function startDiscordBot() {
     ],
   });
 
-  client.on("ready", () => {
+  client.on("clientReady", () => {
     logger.info(`Discord bot logged in as ${client?.user?.tag}`);
   });
 
@@ -39,19 +39,19 @@ export async function startDiscordBot() {
     }
 
     const content = message.content.trim();
-    if (!content.startsWith("/")) return;
+    if (!content.startsWith("!")) return;
 
     const args = content.split(/\s+/);
     const command = args[0].toLowerCase();
 
     try {
-      if (command === "/adduid") {
+      if (command === "!adduid") {
         await handleAddUid(message, args);
-      } else if (command === "/addakses") {
+      } else if (command === "!addakses") {
         await handleAddAkses(message);
-      } else if (command === "/listakses") {
+      } else if (command === "!listakses") {
         await handleListAkses(message);
-      } else if (command === "/flow") {
+      } else if (command === "!flow") {
         await handleFlow(message);
       }
     } catch (err) {
@@ -79,7 +79,7 @@ async function handleAddUid(message: Message, args: string[]) {
 
   const uid = args[1];
   if (!uid || !/^\d{8,15}$/.test(uid)) {
-    await message.reply("❌ Format salah! Ketik: `/adduid <uid>`\nUID harus 8 - 15 angka.");
+    await message.reply("❌ Format salah! Ketik: `!adduid <uid>`\nUID harus 8 - 15 angka.");
     return;
   }
 
@@ -88,9 +88,9 @@ async function handleAddUid(message: Message, args: string[]) {
   const res = await addUid(uid);
   if (res.ok) {
     await addFlowRecord(uid, userId);
-    await replyMsg.edit(`✅ **BERHASIL!**\nUID \`${uid}\` sukses ditambah.\nRespon API: ${res.message}`);
+    await replyMsg.edit(`✅ **BERHASIL!**\nUID \`${uid}\` sukses ditambah.`);
   } else {
-    await replyMsg.edit(`❌ **GAGAL!**\nRespon API: ${res.message}`);
+    await replyMsg.edit(`❌ **GAGAL!**\nUID \`${uid}\` gagal ditambah.`);
   }
 }
 
@@ -103,7 +103,7 @@ async function handleAddAkses(message: Message) {
 
   const mentions = message.mentions.users;
   if (mentions.size === 0) {
-    await message.reply("❌ Kamu harus tag orangnya. Contoh: `/addakses @user`");
+    await message.reply("❌ Kamu harus tag orangnya. Contoh: `!addakses @user`");
     return;
   }
 
