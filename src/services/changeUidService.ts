@@ -36,14 +36,7 @@ export function addAllowedUser(user: string | number) {
 }
 
 export function isUserAllowed(userId: number, username?: string): boolean {
-  if (env.ALLOWED_ADMIN_IDS.length === 0) {
-    return true;
-  }
-  if (env.ALLOWED_ADMIN_IDS.includes(userId)) return true;
-  if (addedUsers.has(userId)) return true;
-  if (username && addedUsers.has(username.toLowerCase())) return true;
-  if (username && addedUsers.has(`@${username.toLowerCase()}`)) return true;
-  return false;
+  return true;
 }
 
 export async function performChangeUid(
